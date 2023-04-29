@@ -1,0 +1,54 @@
+//Java
+public class Server {
+    private String id;
+    private String name;
+    private String ipAddress;
+
+    // constructors, getters and setters omitted for brevity
+}
+@RestController
+@RequestMapping("/servers")
+public class ServerController {
+    private List<Server> servers = new ArrayList<>();
+
+    @GetMapping("")
+    public List<Server> getServers() {
+        return servers;
+    }
+
+    @GetMapping("/{id}")
+    public Server getServerById(@PathVariable("id") String id) {
+        return servers.stream()
+                      .filter(server -> server.getId().equals(id))
+                      .findFirst()
+                      .orElse(null);
+    }
+
+    @PostMapping("")
+    public Server createServer(@RequestBody Server server) {
+        server.setId(UUID.randomUUID().toString());
+        servers.add(server);
+        return server;
+    }
+
+    @PutMapping("/{id}")
+    public Server updateServer(@PathVariable("id") String id, @RequestBody Server server) {
+        Server existingServer = getServerById(id);
+        if (existingServer == null) {
+            return null;
+        }
+        existingServer.setName(server.getName());
+        existingServer.setIpAddress(server.getIpAddress());
+        return existingServer;
+    }
+
+    @DeleteMapping("/{id}")
+    public Server deleteServer(@PathVariable("id") String id) {
+        Server serverToDelete = getServerById(id);
+        if (serverToDelete == null) {
+            return null;
+        }
+        servers.remove(serverToDelete);
+        return serverToDelete;
+    }
+}
